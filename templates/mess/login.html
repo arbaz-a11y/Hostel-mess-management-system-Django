@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Login | Mess Manager{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-7 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="h4 fw-semibold mb-3">Student Login</h2>
+          <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="mb-3">
+              <label class="form-label">USN</label>
+              {{ form.username }}
+              <div class="text-danger small">{{ form.username.errors }}</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              {{ form.password }}
+              <div class="text-danger small">{{ form.password.errors }}</div>
+            </div>
+
+            <button class="btn btn-primary w-100" type="submit">Login</button>
+          </form>
+          <div class="text-center mt-3">
+            <span class="text-secondary">New student?</span>
+            <a href="{% url 'signup' %}">Create an account</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

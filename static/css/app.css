@@ -1,0 +1,21 @@
+/* Light, modern tweaks on top of Bootstrap. */
+
+body {
+  font-feature-settings: "ss01" 1, "ss02" 1;
+}
+
+.card {
+  border: 0;
+}
+
+.list-group-item {
+  border: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.table > :not(caption) > * > * {
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+

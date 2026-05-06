@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard | Mess Manager{% endblock %}
+
+{% block content %}
+  <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+    <div>
+      <div class="h4 fw-semibold mb-1">Admin / Mess Manager Dashboard</div>
+      <div class="text-secondary small">Filter requests by date and estimate meal reduction.</div>
+    </div>
+    <a class="btn btn-outline-secondary" href="/admin/" target="_blank" rel="noreferrer">Django Admin</a>
+  </div>
+
+  <form class="row g-2 mb-3" method="get">
+    <div class="col-12 col-md-3">
+      <label class="form-label small text-secondary mb-1">Date</label>
+      <input class="form-control" type="date" name="date" value="{{ filter_date|date:'Y-m-d' }}">
+    </div>
+    <div class="col-12 col-md-6">
+      <label class="form-label small text-secondary mb-1">Search (name / USN / email)</label>
+      <input class="form-control" type="text" name="q" value="{{ q }}" placeholder="e.g. 1RV.. or Arbaz">
+    </div>
+    <div class="col-12 col-md-3 d-flex align-items-end gap-2">
+      <button class="btn btn-primary w-100" type="submit">Apply</button>
+      <a class="btn btn-outline-secondary w-100" href="{% url 'admin_dashboard' %}">Reset</a>
+    </div>
+  </form>
+
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Total Students</div>
+          <div class="h4 mb-0">{{ students_count }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Absent (Breakfast)</div>
+          <div class="h4 mb-0">{{ absent_breakfast_count }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Absent (Lunch)</div>
+          <div class="h4 mb-0">{{ absent_lunch_count }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Absent (Dinner)</div>
+          <div class="h4 mb-0">{{ absent_dinner_count }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Estimated Meal Reduction ({{ filter_date }})</div>
+          <div class="h4 mb-0">{{ estimated_meal_reduction }}</div>
+          <div class="small text-secondary">Breakfast + Lunch + Dinner absent counts</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Active Leave Requests (from today)</div>
+          <div class="h4 mb-0">{{ active_leave_requests }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-3">
+    <div class="card-body">
+      <div class="fw-semibold mb-2">Meal Absence Requests ({{ filter_date }})</div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>USN</th>
+              <th>Meal</th>
+              <th>Reason</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in meal_absences %}
+              <tr>
+                <td>{{ a.student.full_name }}</td>
+                <td>{{ a.student.usn }}</td>
+                <td>{{ a.get_meal_type_display }}</td>
+                <td class="text-secondary">{{ a.reason|default:"-" }}</td>
+                <td class="text-end">
+                  <form class="d-inline" method="post" action="{% url 'admin_delete_meal_absence' a.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="5" class="text-secondary">No meal absence requests for this date.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-3">
+    <div class="card-body">
+      <div class="fw-semibold mb-2">Leave Requests Active On ({{ filter_date }})</div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>USN</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Reason</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for l in leave_requests %}
+              <tr>
+                <td>{{ l.student.full_name }}</td>
+                <td>{{ l.student.usn }}</td>
+                <td>{{ l.from_date }}</td>
+                <td>{{ l.to_date }}</td>
+                <td class="text-secondary">{{ l.reason|default:"-" }}</td>
+                <td class="text-end">
+                  <form class="d-inline" method="post" action="{% url 'admin_delete_leave_request' l.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="6" class="text-secondary">No leave requests active on this date.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="fw-semibold mb-2">Students</div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>USN</th>
+              <th>Email</th>
+              <th>Room</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in students %}
+              <tr>
+                <td>{{ s.full_name }}</td>
+                <td>{{ s.usn }}</td>
+                <td>{{ s.email }}</td>
+                <td>{{ s.room_number }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="4" class="text-secondary">No students found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

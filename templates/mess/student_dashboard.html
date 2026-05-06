@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | Mess Manager{% endblock %}
+
+{% block content %}
+  <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+    <div>
+      <div class="h4 fw-semibold mb-1">Welcome, {{ profile.full_name }}</div>
+      <div class="text-secondary small">USN: {{ profile.usn }} | Room: {{ profile.room_number }}</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-primary" href="{% url 'meal_absence_create' %}">Mark Meal Absence</a>
+      <a class="btn btn-outline-primary" href="{% url 'leave_request_create' %}">Apply Leave</a>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Today</div>
+          <div class="h5 mb-0">{{ today }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Breakfast</div>
+          <div class="h5 mb-0">
+            {% if absent_breakfast %}<span class="badge text-bg-danger">Absent</span>{% else %}<span class="badge text-bg-success">Present</span>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Lunch</div>
+          <div class="h5 mb-0">
+            {% if absent_lunch %}<span class="badge text-bg-danger">Absent</span>{% else %}<span class="badge text-bg-success">Present</span>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Dinner</div>
+          <div class="h5 mb-0">
+            {% if absent_dinner %}<span class="badge text-bg-danger">Absent</span>{% else %}<span class="badge text-bg-success">Present</span>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="fw-semibold">Upcoming Meal Absences</div>
+            <a class="small" href="{% url 'request_history' %}">View all</a>
+          </div>
+          <div class="table-responsive mt-3">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Meal</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for a in upcoming_meal_absences %}
+                  <tr>
+                    <td>{{ a.date }}</td>
+                    <td>{{ a.get_meal_type_display }}</td>
+                    <td class="text-secondary">{{ a.reason|default:"-" }}</td>
+                  </tr>
+                {% empty %}
+                  <tr><td colspan="3" class="text-secondary">No upcoming meal absences.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="fw-semibold">Active / Upcoming Leave Requests</div>
+            <a class="small" href="{% url 'request_history' %}">View all</a>
+          </div>
+          <div class="table-responsive mt-3">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for l in upcoming_leave_requests %}
+                  <tr>
+                    <td>{{ l.from_date }}</td>
+                    <td>{{ l.to_date }}</td>
+                    <td class="text-secondary">{{ l.reason|default:"-" }}</td>
+                  </tr>
+                {% empty %}
+                  <tr><td colspan="3" class="text-secondary">No active leave requests.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

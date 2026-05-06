@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Home | Mess Manager{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+  <div class="p-4 p-md-5 bg-white rounded-3 shadow-sm">
+    <div class="row align-items-center g-4">
+      <div class="col-12 col-lg-7">
+        <h1 class="display-6 fw-semibold">Hostel Mess Management System</h1>
+        <p class="text-secondary mb-4">
+          Reduce food wastage by letting students inform the mess in advance when they will miss meals.
+        </p>
+        {% if user.is_authenticated %}
+          <a class="btn btn-primary" href="{% url 'student_dashboard' %}">Go to Dashboard</a>
+          {% if user.is_staff %}
+            <a class="btn btn-outline-primary ms-2" href="{% url 'admin_dashboard' %}">Admin Panel</a>
+          {% endif %}
+        {% else %}
+          <a class="btn btn-primary" href="{% url 'signup' %}">Create Student Account</a>
+          <a class="btn btn-outline-primary ms-2" href="{% url 'login' %}">Login</a>
+        {% endif %}
+      </div>
+      <div class="col-12 col-lg-5">
+        <div class="card border-0 bg-primary-subtle">
+          <div class="card-body">
+            <div class="fw-semibold mb-2">What you can do</div>
+            <ul class="mb-0 text-secondary">
+              <li>Mark a single meal absence (Breakfast/Lunch/Dinner)</li>
+              <li>Apply multi-day leave (all meals)</li>
+              <li>View and cancel upcoming requests</li>
+              <li>Admin dashboard with date-wise analytics</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
