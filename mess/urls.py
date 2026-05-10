@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import views
 
@@ -21,16 +22,31 @@ urlpatterns = [
         views.cancel_leave_request,
         name="cancel_leave_request",
     ),
-    path("admin-panel/", views.admin_dashboard, name="admin_dashboard"),
+    path("mess-admin/login/", views.admin_login, name="admin_login"),
+    path("mess-admin/notifications/", views.admin_notifications, name="admin_notifications"),
+    path("mess-admin/students/", views.admin_student_records, name="admin_student_records"),
+    path("mess-admin/", views.admin_dashboard, name="admin_dashboard"),
     path(
-        "admin-panel/meal-absence/<int:pk>/delete/",
+        "mess-admin/meal-absence/<int:pk>/delete/",
         views.admin_delete_meal_absence,
         name="admin_delete_meal_absence",
     ),
     path(
-        "admin-panel/leave/<int:pk>/delete/",
+        "mess-admin/leave/<int:pk>/delete/",
         views.admin_delete_leave_request,
         name="admin_delete_leave_request",
     ),
+    # Preserve older routes used by bookmarks / external links.
+    path(
+        "admin-panel/",
+        RedirectView.as_view(pattern_name="admin_dashboard", query_string=True, permanent=False),
+    ),
+    path(
+        "admin-panel/meal-absence/<int:pk>/delete/",
+        views.admin_delete_meal_absence,
+    ),
+    path(
+        "admin-panel/leave/<int:pk>/delete/",
+        views.admin_delete_leave_request,
+    ),
 ]
-

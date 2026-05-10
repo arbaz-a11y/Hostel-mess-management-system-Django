@@ -1,10 +1,22 @@
 from __future__ import annotations
 
+import re
+
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 
 from .models import LeaveRequest, MealAbsence, StudentProfile, StudentUser
+
+USN_ERROR_MESSAGE = (
+    "USN must start with '2AB', contain exactly 10 characters, "
+    "and include only letters and numbers."
+)
+USN_PATTERN = re.compile(r"^2AB[a-zA-Z0-9]{7}$")
+
+
+def normalize_usn(value: str) -> str:
+    return (value or "").strip().upper()
 
 
 class USNAuthenticationForm(AuthenticationForm):
@@ -20,10 +32,31 @@ class USNAuthenticationForm(AuthenticationForm):
         self.fields["username"].widget.attrs.update({"class": "form-control"})
         self.fields["password"].widget.attrs.update({"class": "form-control"})
 
+    def clean_username(self) -> str:
+        # Match signup storage: Django auth looks up StudentUser.username in uppercase.
+        return normalize_usn(self.cleaned_data.get("username", ""))
+
+
+class AdminAuthenticationForm(AuthenticationForm):
+    """
+    Staff/superuser login form using Django's native username + password flow.
+    """
+
+    username = forms.CharField(label="Username")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs.update(
+            {"class": "form-control", "autocomplete": "username"}
+        )
+        self.fields["password"].widget.attrs.update(
+            {"class": "form-control", "autocomplete": "current-password"}
+        )
+
 
 class StudentSignupForm(forms.Form):
     full_name = forms.CharField(max_length=150)
-    usn = forms.CharField(max_length=20)
+    usn = forms.CharField(max_length=10)
     email = forms.EmailField()
     room_number = forms.CharField(max_length=20)
     password = forms.CharField(widget=forms.PasswordInput)
@@ -35,9 +68,13 @@ class StudentSignupForm(forms.Form):
                 field.widget.attrs.update({"class": "form-control"})
             else:
                 field.widget.attrs.update({"class": "form-control"})
+        self.fields["usn"].widget.attrs.setdefault("maxlength", "10")
 
     def clean_usn(self) -> str:
-        usn = self.cleaned_data["usn"].strip()
+        usn = normalize_usn(self.cleaned_data.get("usn", ""))
+
+        if len(usn) != 10 or not USN_PATTERN.fullmatch(usn):
+            raise ValidationError(USN_ERROR_MESSAGE)
 
         if StudentUser.objects.filter(username=usn).exists():
             raise ValidationError("This USN is already registered.")
@@ -110,4 +147,3 @@ class LeaveRequestForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.setdefault("class", "form-control")
-

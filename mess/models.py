@@ -1,6 +1,16 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from django.db import models
+
+# Strict USN: exactly 10 chars, starts with 2AB, letters and digits only (saved uppercase).
+USN_VALIDATOR = RegexValidator(
+    regex=r"^2AB[a-zA-Z0-9]{7}$",
+    message=(
+        "USN must start with '2AB', contain exactly 10 characters, "
+        "and include only letters and numbers."
+    ),
+)
 
 
 class StudentUser(AbstractUser):
@@ -27,7 +37,7 @@ class StudentProfile(models.Model):
         related_name="profile",
     )
     full_name = models.CharField(max_length=150)
-    usn = models.CharField(max_length=20, unique=True)
+    usn = models.CharField(max_length=10, unique=True, validators=[USN_VALIDATOR])
     email = models.EmailField()
     room_number = models.CharField(max_length=20)
 
@@ -50,6 +60,8 @@ class MealAbsence(models.Model):
     meal_type = models.CharField(max_length=10, choices=MealType.choices)
     reason = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    # Cleared when staff opens the custom notifications inbox.
+    is_seen = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
@@ -75,10 +87,10 @@ class LeaveRequest(models.Model):
     to_date = models.DateField()
     reason = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_seen = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["-from_date", "-created_at"]
 
     def __str__(self) -> str:
         return f"{self.student.usn} - Leave {self.from_date} to {self.to_date}"
-

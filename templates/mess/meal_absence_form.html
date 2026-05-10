@@ -1,12 +1,17 @@
 {% extends 'base.html' %}
-{% block title %}Meal Absence | Mess Manager{% endblock %}
+{% block title %}Meal absence | MessMate{% endblock %}
 
 {% block content %}
-  <div class="card shadow-sm">
+  <div class="card card-mess">
     <div class="card-body p-4">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h2 class="h5 fw-semibold mb-0">Mark Single Meal Absence</h2>
-        <a class="btn btn-sm btn-outline-secondary" href="{% url 'request_history' %}">History</a>
+      <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <div>
+          <div class="h4 fw-semibold mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-cup-hot-fill text-warning"></i> Mark a single meal absence
+          </div>
+          <div class="text-muted small">Only one row per student / day / meal — duplicates are blocked.</div>
+        </div>
+        <a class="btn btn-outline-mess btn-sm" href="{% url 'request_history' %}"><i class="bi bi-clock-history me-1"></i> History</a>
       </div>
 
       <form method="post" novalidate>
@@ -23,7 +28,7 @@
             <div class="text-danger small">{{ form.date.errors }}</div>
           </div>
           <div class="col-12 col-md-4">
-            <label class="form-label">Meal Type</label>
+            <label class="form-label">Meal type</label>
             {{ form.meal_type }}
             <div class="text-danger small">{{ form.meal_type.errors }}</div>
           </div>
@@ -34,12 +39,11 @@
           </div>
         </div>
 
-        <div class="mt-4">
-          <button class="btn btn-primary" type="submit">Submit Absence</button>
-          <a class="btn btn-outline-secondary ms-2" href="{% url 'student_dashboard' %}">Back</a>
+        <div class="mt-4 d-flex flex-wrap gap-2">
+          <button class="btn btn-mess-primary" type="submit"><i class="bi bi-send me-1"></i> Submit absence</button>
+          <a class="btn btn-outline-secondary" href="{% url 'student_dashboard' %}">Dashboard</a>
         </div>
       </form>
     </div>
   </div>
 {% endblock %}
-

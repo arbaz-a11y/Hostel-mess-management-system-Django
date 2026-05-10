@@ -18,12 +18,12 @@ class StudentProfileAdmin(admin.ModelAdmin):
 @admin.register(MealAbsence)
 class MealAbsenceAdmin(admin.ModelAdmin):
     search_fields = ("student__usn", "student__full_name")
-    list_display = ("student", "date", "meal_type", "created_at")
-    list_filter = ("date", "meal_type")
+    list_display = ("student", "date", "meal_type", "is_seen", "created_at")
+    list_filter = ("date", "meal_type", "is_seen")
 
 
 @admin.register(LeaveRequest)
 class LeaveRequestAdmin(admin.ModelAdmin):
     search_fields = ("student__usn", "student__full_name")
-    list_display = ("student", "from_date", "to_date", "created_at")
-    list_filter = ("from_date", "to_date")
+    list_display = ("student", "from_date", "to_date", "is_seen", "created_at")
+    list_filter = ("from_date", "to_date", "is_seen")

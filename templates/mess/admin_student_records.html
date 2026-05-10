@@ -1,0 +1,52 @@
+{% extends "mess/admin_shell.html" %}
+{% block title %}Student records | MessMate{% endblock %}
+
+{% block admin_main %}
+  <div class="d-flex flex-wrap gap-3 align-items-end justify-content-between mb-4">
+    <div>
+      <div class="h3 fw-semibold mb-1 d-flex align-items-center gap-2">
+        <i class="bi bi-people-fill text-danger"></i> Student roster
+      </div>
+      <div class="text-muted small">Hosted profiles: <span class="fw-semibold text-body">{{ students_count }}</span></div>
+    </div>
+
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-auto">
+        <input class="form-control" type="text" name="q" value="{{ q }}" placeholder="Search name / USN / email" style="min-width: 260px;">
+      </div>
+      <div class="col-auto d-flex gap-2">
+        <button class="btn btn-mess-primary" type="submit"><i class="bi bi-search me-1"></i> Search</button>
+        <a class="btn btn-outline-secondary" href="{% url 'admin_student_records' %}">Reset</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="card card-mess">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle table-mess mb-0">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>USN</th>
+              <th>Email</th>
+              <th>Room</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in students %}
+              <tr>
+                <td>{{ s.full_name }}</td>
+                <td><span class="fw-semibold">{{ s.usn }}</span></td>
+                <td class="text-muted">{{ s.email }}</td>
+                <td>{{ s.room_number }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="4" class="text-muted">No students match that search query.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
